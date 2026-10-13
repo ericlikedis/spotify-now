@@ -7,6 +7,9 @@ green box with animated equalizer bars. macOS only.
  ⣤⣶ ♪ Artist - Title
 ```
 
+<img width="738" height="440" alt="iTerm2-2026-10-13-18-51" src="https://github.com/user-attachments/assets/93eb2970-e689-4135-848c-014b8a98d8ce" />
+
+
 ## How it works
 
 - Asks the Spotify desktop app what is playing through AppleScript (`osascript`),

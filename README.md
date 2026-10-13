@@ -51,6 +51,9 @@ Set these before `source $ZSH/oh-my-zsh.sh`.
 
 ## Choosing a color
 
+<img width="800" height="272" alt="iTerm2-2026-10-13-18-25" src="https://github.com/user-attachments/assets/e33bafb3-5852-48c1-9461-8dac91fef690" />
+
+
 ```zsh
 spotify-now-color            # opens color-picker.html in your browser
 spotify-now-color '#ff5f87'  # set and save a color directly

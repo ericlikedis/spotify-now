@@ -44,6 +44,27 @@ Set these before `source $ZSH/oh-my-zsh.sh`.
 | `SPOTIFY_ROUNDED` | `1` | Rounded caps. Needs a Nerd Font; set `0` for a square box |
 | `SPOTIFY_BARS_INTERVAL` | `0.12` | Seconds between animation frames |
 | `SPOTIFY_NOW_INTERVAL` | `5` | Seconds between track checks |
+| `SPOTIFY_COLOR` | unset | Box color as `#RRGGBB`. Overrides a color saved with `spotify-now-color` |
+
+## Choosing a color
+
+```zsh
+spotify-now-color            # opens color-picker.html in your browser
+spotify-now-color '#ff5f87'  # set and save a color directly
+spotify-now-color reset      # back to Spotify green
+```
+
+The picker page has a color wheel, a hex field, a live preview and a "Copy"
+button. It generates the `spotify-now-color '#rrggbb'` command; paste it into a
+terminal and the new color applies on the next prompt redraw. Your choice is
+saved to `~/.config/spotify-now/color` (or `$XDG_CONFIG_HOME/spotify-now/color`).
+
+Text color switches between black and white automatically, based on how bright
+the box color is. Colors are validated as `#RRGGBB` before being used, and
+anything else is rejected.
+
+Hex colors need a truecolor terminal (iTerm2 and Terminal.app on recent macOS
+qualify). Elsewhere, zsh approximates them with its 256-color palette.
 
 ## Notes
 

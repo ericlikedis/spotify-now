@@ -18,8 +18,79 @@ _spotify_cache="${TMPDIR:-/tmp}/spotify-now.$UID"
 : ${SPOTIFY_BARS_INTERVAL:=0.12}    # seconds between bar animation frames
 : ${SPOTIFY_NOW_INTERVAL:=5}        # seconds between track refreshes
 : ${SPOTIFY_ROUNDED:=1}             # 1 = rounded caps (needs a Nerd Font), 0 = square box
+# Box color as #RRGGBB. Set it here, or pick one with `spotify-now-color`.
+# Precedence: SPOTIFY_COLOR from your .zshrc, else the saved choice, else green.
+
+_spotify_dir=${0:A:h}
+_spotify_color_file="${XDG_CONFIG_HOME:-$HOME/.config}/spotify-now/color"
 
 zmodload zsh/zselect 2>/dev/null    # fork-free sub-second waits
+# Hex colors need truecolor; otherwise let zsh approximate them in 256 colors.
+[[ $COLORTERM == (truecolor|24bit) ]] || zmodload zsh/nearcolor 2>/dev/null
+
+# Validate a color; prints it as lowercase #rrggbb, fails on anything else.
+# Callers must use this before the value reaches a prompt string.
+_spotify_normalize_color() {
+  [[ $1 =~ '^#?([0-9a-fA-F]{6})$' ]] || return 1
+  print -r -- "#${(L)match[1]}"
+}
+
+# Set the box colors from a validated #rrggbb: background, readable text, caps
+_spotify_apply_color() {
+  local hex=$1
+  local -i r=$(( 16#${hex[2,3]} )) g=$(( 16#${hex[4,5]} )) b=$(( 16#${hex[6,7]} ))
+  _spotify_bg=$hex
+  # perceived brightness decides black or white text
+  if (( (r * 299 + g * 587 + b * 114) / 1000 > 100 )); then
+    _spotify_fg="#000000"
+  else
+    _spotify_fg="#ffffff"
+  fi
+}
+
+# spotify-now-color            open the HTML color picker
+# spotify-now-color '#1db954'  set and save a color
+# spotify-now-color reset      go back to Spotify green
+spotify-now-color() {
+  local arg=$1 hex
+  case $arg in
+    ""|pick)
+      local url="file://${_spotify_dir// /%20}/color-picker.html#${_spotify_bg#\#}"
+      if (( $+commands[open] )); then
+        open "$url"
+      else
+        print -r -- "Open this in a browser: $url"
+      fi
+      ;;
+    reset)
+      rm -f -- "$_spotify_color_file"
+      _spotify_apply_color "#1db954"
+      _spotify_build_segment
+      print -r -- "spotify-now: color reset to #1db954"
+      ;;
+    *)
+      if ! hex=$(_spotify_normalize_color "$arg"); then
+        print -u2 -r -- "spotify-now: '$arg' is not a #RRGGBB color"
+        return 1
+      fi
+      mkdir -p -- "${_spotify_color_file:h}" && print -r -- "$hex" > "$_spotify_color_file"
+      _spotify_apply_color "$hex"
+      _spotify_build_segment
+      print -r -- "spotify-now: color set to $hex"
+      ;;
+  esac
+}
+
+# Pick the starting color
+() {
+  local hex
+  if [[ -n $SPOTIFY_COLOR ]]; then
+    hex=$(_spotify_normalize_color "$SPOTIFY_COLOR")
+  elif [[ -r $_spotify_color_file ]]; then
+    hex=$(_spotify_normalize_color "$(<$_spotify_color_file)")
+  fi
+  _spotify_apply_color "${hex:-#1db954}"
+}
 
 # Runs in a background job; writes result to the cache file
 _spotify_fetch() {
@@ -63,9 +134,9 @@ _spotify_build_segment() {
     local text=$SPOTIFY_NOW
     (( ${#text} > 40 )) && text="${text[1,39]}…"
     if (( SPOTIFY_ROUNDED )); then
-      SPOTIFY_SEGMENT="%F{35}"$''"%K{35}%F{black} ${SPOTIFY_BARS} ♪ ${text} %k%F{35}"$''"%f"
+      SPOTIFY_SEGMENT="%F{${_spotify_bg}}"$''"%K{${_spotify_bg}}%F{${_spotify_fg}} ${SPOTIFY_BARS} ♪ ${text} %k%F{${_spotify_bg}}"$''"%f"
     else
-      SPOTIFY_SEGMENT="%K{35}%F{black} ${SPOTIFY_BARS} ♪ ${text} %f%k"
+      SPOTIFY_SEGMENT="%K{${_spotify_bg}}%F{${_spotify_fg}} ${SPOTIFY_BARS} ♪ ${text} %f%k"
     fi
   else
     SPOTIFY_SEGMENT=""

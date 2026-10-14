@@ -47,6 +47,7 @@ Set these before `source $ZSH/oh-my-zsh.sh`.
 | `SPOTIFY_ROUNDED` | `1` | Rounded caps. Needs a Nerd Font; set `0` for a square box |
 | `SPOTIFY_BARS_INTERVAL` | `0.12` | Seconds between animation frames |
 | `SPOTIFY_NOW_INTERVAL` | `5` | Seconds between track checks |
+| `SPOTIFY_TRANSIENT` | `1` | Only show the segment on the line you're typing on. Sets zsh's global `transient_rprompt` option, so it applies to anything in `RPROMPT`. Set `0` to keep it on earlier lines |
 | `SPOTIFY_COLOR` | unset | Box color as `#RRGGBB`. Overrides a color saved with `spotify-now-color` |
 
 ## Choosing a color

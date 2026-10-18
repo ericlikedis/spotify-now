@@ -77,7 +77,7 @@ qualify). Elsewhere, zsh approximates them with its 256-color palette.
 
 ## Notes
 
-- Tested with zsh 5.9 on macOS and iTerm2. Powerlevel10k needs a custom segment
+- Tested with zsh 5.9 on macOS and iTerm2, and on SteamOS (Arch) with the Flatpak Spotify. Powerlevel10k needs a custom segment
   instead of `RPROMPT`.
 - Not affiliated with Spotify. It uses the app's local scripting interface and
   not the Web API.

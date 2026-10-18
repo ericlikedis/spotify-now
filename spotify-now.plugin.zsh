@@ -1,4 +1,4 @@
-# spotify-now: Spotify now-playing segment with animated equalizer bars (macOS).
+# spotify-now: Spotify now-playing segment with animated equalizer bars (macOS and Linux).
 #
 # No signals: a background ticker writes one line per frame to a pipe and zle
 # calls _spotify_on_tick (via `zle -F`) when it is readable, at a safe point
@@ -63,6 +63,8 @@ spotify-now-color() {
       local url="file://${_spotify_dir// /%20}/color-picker.html#${_spotify_bg#\#}"
       if (( $+commands[open] )); then
         open "$url"
+      elif (( $+commands[xdg-open] )); then
+        xdg-open "$url" >/dev/null 2>&1
       else
         print -r -- "Open this in a browser: $url"
       fi
@@ -97,10 +99,27 @@ spotify-now-color() {
   _spotify_apply_color "${hex:-#1db954}"
 }
 
+# Linux: ask Spotify over MPRIS (D-Bus). Prints "Artist - Title" while playing.
+_spotify_fetch_mpris() {
+  local dest=org.mpris.MediaPlayer2.spotify path=/org/mpris/MediaPlayer2
+  local iface=org.mpris.MediaPlayer2.Player state meta
+  state=$(busctl --user --json=short get-property $dest $path $iface PlaybackStatus 2>/dev/null) || return
+  [[ $state == *'"Playing"'* ]] || return
+  meta=$(busctl --user --json=short get-property $dest $path $iface Metadata 2>/dev/null) || return
+  if (( $+commands[jq] )); then
+    jq -r '.data as $m | (($m["xesam:artist"].data // []) | join(", ")) + " - " + ($m["xesam:title"].data // "")' <<<$meta
+  elif (( $+commands[python3] )); then
+    python3 -I -c 'import json, sys
+m = json.load(sys.stdin)["data"]
+print(", ".join(m.get("xesam:artist", {}).get("data", [])) + " - " + m.get("xesam:title", {}).get("data", ""))' <<<$meta
+  fi
+}
+
 # Runs in a background job; writes result to the cache file
 _spotify_fetch() {
   local out
-  out=$(osascript 2>/dev/null <<'EOF'
+  if (( $+commands[osascript] )); then
+    out=$(osascript 2>/dev/null <<'EOF'
 if application "Spotify" is running then
   tell application "Spotify"
     if player state is playing then
@@ -111,6 +130,9 @@ end if
 return ""
 EOF
 )
+  elif (( $+commands[busctl] )); then
+    out=$(_spotify_fetch_mpris)
+  fi
   print -r -- "$out" > "$_spotify_cache"
 }
 

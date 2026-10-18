@@ -1,7 +1,7 @@
 # spotify-now
 
 An oh-my-zsh plugin that shows the track Spotify is playing in your prompt, in a
-green box with animated equalizer bars. macOS only.
+green box with animated equalizer bars. Works on macOS and Linux.
 
 ```
  ⣤⣶ ♪ Artist - Title
@@ -12,8 +12,10 @@ green box with animated equalizer bars. macOS only.
 
 ## How it works
 
-- Asks the Spotify desktop app what is playing through AppleScript (`osascript`),
-  in a background job so typing never lags.
+- Asks the Spotify desktop app what is playing, in a background job so typing
+  never lags. On macOS it uses AppleScript (`osascript`). On Linux it reads the
+  MPRIS D-Bus interface with `busctl` (part of systemd), parsed with `jq`
+  (or `python3` if `jq` is missing). Spotify installed from Flatpak works.
 - A background ticker drives the animation through `zle -F`. No signals or
   `TMOUT` traps are used.
 - The bars are decorative. Spotify does not expose audio levels.
@@ -35,8 +37,8 @@ setopt PROMPT_SUBST
 RPROMPT='$SPOTIFY_SEGMENT'
 ```
 
-The first time it runs, macOS asks whether your terminal may control Spotify.
-Allow it.
+On macOS, the first time it runs, macOS asks whether your terminal may control
+Spotify. Allow it. On Linux nothing extra is needed.
 
 ## Options
 

@@ -101,11 +101,11 @@ spotify-now-color() {
 
 # Linux: ask Spotify over MPRIS (D-Bus). Prints "Artist - Title" while playing.
 _spotify_fetch_mpris() {
-  local dest=org.mpris.MediaPlayer2.spotify path=/org/mpris/MediaPlayer2
+  local dest=org.mpris.MediaPlayer2.spotify obj=/org/mpris/MediaPlayer2
   local iface=org.mpris.MediaPlayer2.Player state meta
-  state=$(busctl --user --json=short get-property $dest $path $iface PlaybackStatus 2>/dev/null) || return
+  state=$(busctl --user --json=short get-property $dest $obj $iface PlaybackStatus 2>/dev/null) || return
   [[ $state == *'"Playing"'* ]] || return
-  meta=$(busctl --user --json=short get-property $dest $path $iface Metadata 2>/dev/null) || return
+  meta=$(busctl --user --json=short get-property $dest $obj $iface Metadata 2>/dev/null) || return
   if (( $+commands[jq] )); then
     jq -r '.data as $m | (($m["xesam:artist"].data // []) | join(", ")) + " - " + ($m["xesam:title"].data // "")' <<<$meta
   elif (( $+commands[python3] )); then

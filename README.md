@@ -178,5 +178,16 @@ qualify). Elsewhere, zsh approximates them with its 256-color palette.
 
 - Tested with zsh 5.9 on macOS and iTerm2, and on SteamOS (Arch) with the Flatpak Spotify. Powerlevel10k needs a custom segment
   instead of `RPROMPT`.
-- Not affiliated with Spotify. It uses the app's local scripting interface and
-  not the Web API.
+
+## Disclaimer
+
+spotify-now is an independent, unofficial project. It is not affiliated with,
+endorsed by, or sponsored by Spotify AB. "Spotify" and the Spotify logo are
+trademarks of Spotify AB; the name is used here only to describe what the
+plugin works with. The plugin doesn't use the Spotify logo.
+
+It reads the current track from the Spotify desktop app through the local
+interface your system provides (AppleScript on macOS, MPRIS on Linux), on your
+own computer. It doesn't use the Spotify Web API, and it doesn't download,
+record or alter any audio or content. Use of Spotify
+remains subject to Spotify's own terms and guidelines.

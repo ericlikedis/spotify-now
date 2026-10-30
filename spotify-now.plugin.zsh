@@ -16,7 +16,7 @@ typeset -gi _spotify_frame=0
 _spotify_fd=""
 _spotify_cache="${TMPDIR:-/tmp}/spotify-now.$UID"
 : ${SPOTIFY_BARS_INTERVAL:=0.12}    # seconds between bar animation frames
-: ${SPOTIFY_NOW_INTERVAL:=5}        # seconds between track refreshes
+: ${SPOTIFY_NOW_INTERVAL:=0.1}        # seconds between track refreshes
 : ${SPOTIFY_ROUNDED:=1}             # 1 = rounded caps (needs a Nerd Font), 0 = square box
 : ${SPOTIFY_TRANSIENT:=1}           # 1 = only show on the active line (when used in RPROMPT)
 
